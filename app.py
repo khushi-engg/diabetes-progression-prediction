@@ -27,3 +27,29 @@ st.write(" The Diabetes Progression dataset.")
 # Button to display first 10 rows
 if st.button("Show First 10 Rows"):
     st.dataframe(df.head(10), use_container_width=True)
+
+
+st.subheader("Feature vs Diabetes Progression Scatter Plots")
+
+if st.button("Show Scatter Plots"):
+
+    fig = plt.figure(figsize=(15, 12))
+
+    for i, feature in enumerate(features, 1):
+        ax = fig.add_subplot(4, 3, i)
+
+        sns.scatterplot(
+            data=df,
+            x=feature,
+            y="target",
+            ax=ax
+        )
+
+        ax.set_title(f"{feature} vs Diabetes Progression")
+
+    fig.tight_layout()
+
+    st.pyplot(fig)
+
+    plt.close(fig)
+
