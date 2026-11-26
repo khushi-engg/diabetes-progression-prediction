@@ -19,7 +19,8 @@ df["target"] = diabetes.target
 # Website title
 st.title("Diabetes Progression Prediction")
 
-
+# Define features
+features = diabetes.feature_names
 
 # Dataset Explorer
 
