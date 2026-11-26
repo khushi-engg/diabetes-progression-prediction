@@ -441,41 +441,227 @@ if st.button("4. Clinical Feature Importance"):
     plt.close(fig)
 
 
-# ------------------------------
-# VISUALIZATION 5: Model Metrics Comparison
-# ------------------------------
+# ==========================================
+# VISUALIZATIONS SECTION
+# ==========================================
+
+st.header("Visualizations")
+
+
+# ==========================================
+# VISUALIZATION 1: ACTUAL VS PREDICTED
+# ==========================================
+
+if st.button("1. Actual vs Predicted Plot"):
+
+    if "best_predictions" not in st.session_state:
+        st.warning("Please click Train & Compare Models first.")
+
+    else:
+        y_test = st.session_state["y_test"]
+        best_predictions = st.session_state["best_predictions"]
+        best_model_name = st.session_state["best_model_name"]
+
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        ax.scatter(y_test, best_predictions, alpha=0.7)
+
+        min_value = min(np.min(y_test), np.min(best_predictions))
+        max_value = max(np.max(y_test), np.max(best_predictions))
+
+        ax.plot(
+            [min_value, max_value],
+            [min_value, max_value],
+            color="red",
+            linestyle="--",
+            label="Perfect Prediction"
+        )
+
+        ax.set_xlabel("Actual Diabetes Progression")
+        ax.set_ylabel("Predicted Diabetes Progression")
+        ax.set_title(f"Actual vs Predicted ({best_model_name})")
+        ax.legend()
+        ax.grid(True)
+
+        fig.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+
+
+# ==========================================
+# VISUALIZATION 2: RESIDUAL DISTRIBUTION
+# ==========================================
+
+if st.button("2. Residual Distribution Plot"):
+
+    if "best_predictions" not in st.session_state:
+        st.warning("Please click Train & Compare Models first.")
+
+    else:
+        y_test = st.session_state["y_test"]
+        best_predictions = st.session_state["best_predictions"]
+        best_model_name = st.session_state["best_model_name"]
+
+        residuals = np.array(y_test) - np.array(best_predictions)
+
+        fig, ax = plt.subplots(figsize=(8, 6))
+
+        ax.hist(
+            residuals,
+            bins=20,
+            edgecolor="black"
+        )
+
+        ax.axvline(
+            x=0,
+            color="red",
+            linestyle="--",
+            label="Zero Error"
+        )
+
+        ax.set_xlabel("Residuals (Actual - Predicted)")
+        ax.set_ylabel("Frequency")
+        ax.set_title(f"Residual Distribution ({best_model_name})")
+        ax.legend()
+        ax.grid(axis="y", alpha=0.3)
+
+        fig.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+
+
+# ==========================================
+# VISUALIZATION 3: CORRELATION HEATMAP
+# ==========================================
+
+if st.button("3. Feature Correlation Heatmap"):
+
+    fig, ax = plt.subplots(figsize=(12, 9))
+
+    correlation = df.corr()
+
+    sns.heatmap(
+        correlation,
+        annot=True,
+        cmap="coolwarm",
+        fmt=".2f",
+        linewidths=0.5,
+        ax=ax
+    )
+
+    ax.set_title("Feature Correlation Heatmap")
+
+    fig.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
+
+
+# ==========================================
+# VISUALIZATION 4: CLINICAL FEATURE IMPORTANCE
+# ==========================================
+
+if st.button("4. Clinical Feature Importance"):
+
+    X_feature = df[features]
+    y_feature = df["target"]
+
+    rf_feature_model = RandomForestRegressor(
+        n_estimators=100,
+        random_state=42
+    )
+
+    rf_feature_model.fit(X_feature, y_feature)
+
+    importance = rf_feature_model.feature_importances_
+
+    importance_df = pd.DataFrame({
+        "Feature": features,
+        "Importance": importance
+    })
+
+    importance_df = importance_df.sort_values(
+        by="Importance",
+        ascending=False
+    )
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    sns.barplot(
+        data=importance_df,
+        x="Importance",
+        y="Feature",
+        ax=ax
+    )
+
+    ax.set_title("Clinical Feature Importance")
+    ax.set_xlabel("Importance Score")
+    ax.set_ylabel("Clinical Feature")
+
+    fig.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
+
+
+# ==========================================
+# VISUALIZATION 5: MODEL METRIC COMPARISON
+# ==========================================
 
 if st.button("5. Model Performance Comparison Charts"):
+
     if "results_df" not in st.session_state:
-        st.warning("Please train and compare the models first.")
+        st.warning("Please click Train & Compare Models first.")
+
     else:
         results_df = st.session_state["results_df"]
 
-        fig, axes = plt.subplots(1, 4, figsize=(22, 6))
+        fig, axes = plt.subplots(
+            1, 4,
+            figsize=(22, 6)
+        )
 
-        # MAE
-        axes[0].bar(results_df["Model"], results_df["MAE"])
+        # MAE Comparison
+        axes[0].bar(
+            results_df["Model"],
+            results_df["MAE"]
+        )
+
         axes[0].set_title("Model Comparison - MAE")
         axes[0].set_ylabel("MAE (Lower is Better)")
         axes[0].tick_params(axis="x", rotation=45)
 
-        # MSE
-        axes[1].bar(results_df["Model"], results_df["MSE"])
+
+        # MSE Comparison
+        axes[1].bar(
+            results_df["Model"],
+            results_df["MSE"]
+        )
+
         axes[1].set_title("Model Comparison - MSE")
         axes[1].set_ylabel("MSE (Lower is Better)")
         axes[1].tick_params(axis="x", rotation=45)
 
-        # RMSE
-        axes[2].bar(results_df["Model"], results_df["RMSE"])
+
+        # RMSE Comparison
+        axes[2].bar(
+            results_df["Model"],
+            results_df["RMSE"]
+        )
+
         axes[2].set_title("Model Comparison - RMSE")
         axes[2].set_ylabel("RMSE (Lower is Better)")
         axes[2].tick_params(axis="x", rotation=45)
 
-        # R2
-        axes[3].bar(results_df["Model"], results_df["R2 Score"])
+
+        # R2 Comparison
+        axes[3].bar(
+            results_df["Model"],
+            results_df["R2 Score"]
+        )
+
         axes[3].set_title("Model Comparison - R²")
         axes[3].set_ylabel("R² (Higher is Better)")
         axes[3].tick_params(axis="x", rotation=45)
+
 
         plt.suptitle(
             "Performance Comparison of Regression Models",
@@ -483,5 +669,6 @@ if st.button("5. Model Performance Comparison Charts"):
         )
 
         fig.tight_layout()
+
         st.pyplot(fig)
         plt.close(fig)
