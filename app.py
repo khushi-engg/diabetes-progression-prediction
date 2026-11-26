@@ -13,7 +13,36 @@ df = pd.DataFrame(
     diabetes.data,
     columns=diabetes.feature_names
 )
+# ==========================================
+# CUSTOM BUTTON STYLING
+# ==========================================
 
+st.markdown("""
+<style>
+
+div.stButton > button {
+    background-color: #315D72;
+    color: #FFFFFF;
+    border: 1px solid #315D72;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+div.stButton > button:hover {
+    background-color: #27485B;
+    color: #FFFFFF;
+    border: 1px solid #27485B;
+}
+
+div.stButton > button:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+</style>
+""", unsafe_allow_html=True)
 # Add target column
 df["target"] = diabetes.target
 
