@@ -91,3 +91,30 @@ st.dataframe(
         df["target"].describe().to_frame(),
         use_container_width=True
 )
+# ==========================================
+# CORRELATION RANKING
+# ==========================================
+
+st.subheader("Correlation of Clinical Features with Diabetes Progression")
+
+if st.button("Show Correlation Ranking"):
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    sns.barplot(
+        x=target_corr.values,
+        y=target_corr.index,
+        palette="coolwarm",
+        ax=ax
+    )
+
+    ax.set_title("Correlation of Clinical Features with Diabetes Progression")
+    ax.set_xlabel("Correlation Coefficient")
+    ax.set_ylabel("Clinical Features")
+    ax.axvline(x=0, color="black", linestyle="--")
+
+    fig.tight_layout()
+
+    st.pyplot(fig)
+
+    plt.close(fig)
