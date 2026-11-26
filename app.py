@@ -190,120 +190,80 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
 # ==========================================
-# MODEL COMPARISON - FOUR REGRESSION MODELS
+# MODEL COMPARISON
 # ==========================================
 
 st.header("Model Comparison")
-
 st.write("Compare the performance of four machine learning regression models.")
 
-# Prepare features and target
 X = df[features].copy()
 y = df["target"].copy()
 
-# Split dataset
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# Initialize four models
 models = {
     "Linear Regression": make_pipeline(
-        StandardScaler(),
-        LinearRegression()
+        StandardScaler(), LinearRegression()
     ),
-
     "KNN Regression": make_pipeline(
-        StandardScaler(),
-        KNeighborsRegressor(n_neighbors=5)
+        StandardScaler(), KNeighborsRegressor(n_neighbors=5)
     ),
-
     "Decision Tree Regression": DecisionTreeRegressor(
-        max_depth=5,
-        random_state=42
+        max_depth=5, random_state=42
     ),
-
     "Random Forest Regression": RandomForestRegressor(
-        n_estimators=200,
-        random_state=42
+        n_estimators=200, random_state=42
     )
 }
 
-if st.button("Train & Compare Models"):
+results = []
+predictions = {}
 
-    results = []
-    predictions = {}
+for name, model in models.items():
 
-    for name, model in models.items():
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
 
-        # Train model
-        model.fit(X_train, y_train)
+    predictions[name] = y_pred
 
-        # Predict test data
-        y_pred = model.predict(X_test)
+    mae = mean_absolute_error(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = np.sqrt(mse)
+    r2 = r2_score(y_test, y_pred)
 
-        predictions[name] = y_pred
+    results.append({
+        "Model": name,
+        "MAE": mae,
+        "MSE": mse,
+        "RMSE": rmse,
+        "R2 Score": r2
+    })
 
-        # Evaluation metrics
-        mae = mean_absolute_error(y_test, y_pred)
-        mse = mean_squared_error(y_test, y_pred)
-        rmse = np.sqrt(mse)
-        r2 = r2_score(y_test, y_pred)
+results_df = pd.DataFrame(results)
 
-        # Save results
-        results.append({
-            "Model": name,
-            "MAE": mae,
-            "MSE": mse,
-            "RMSE": rmse,
-            "R2 Score": r2
-        })
+st.subheader("Model Performance Comparison")
+st.dataframe(
+    results_df.round(4),
+    use_container_width=True,
+    hide_index=True
+)
 
-    # Create results DataFrame
-    results_df = pd.DataFrame(results)
+# Find the best model
+best_model = results_df.loc[results_df["RMSE"].idxmin()]
+best_model_name = best_model["Model"]
+best_predictions = predictions[best_model_name]
 
-    # Display model comparison
-    st.subheader("Model Performance Comparison")
+st.subheader("Best Performing Model")
+st.success(f"Best Model: {best_model_name}")
 
-    st.dataframe(
-        results_df.round(4),
-        use_container_width=True,
-        hide_index=True
-    )
-    best_model = results_df.loc[results_df["RMSE"].idxmin()]
-    best_model_name = best_model["Model"]
+col1, col2, col3, col4 = st.columns(4)
 
-    # Get predictions from the best model
-    best_predictions = predictions[best_model_name]
-
-    # Save everything in Streamlit session state
-    st.session_state["results_df"] = results_df
-    st.session_state["best_model_name"] = best_model_name
-    st.session_state["best_predictions"] = best_predictions
-    st.session_state["y_test"] = y_test
-    # ==========================================
-    # BEST PERFORMING MODEL
-    # ==========================================
-
-    st.subheader("Best Performing Model")
-
-    # Select model with lowest RMSE
-    best_model = results_df.loc[results_df["RMSE"].idxmin()]
-
-    best_model_name = best_model["Model"]
-    best_mae = best_model["MAE"]
-    best_mse = best_model["MSE"]
-    best_rmse = best_model["RMSE"]
-    best_r2 = best_model["R2 Score"]
-
-    st.success(f"Best Model: {best_model_name}")
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    col1.metric("MAE", round(best_mae, 4))
-    col2.metric("MSE", round(best_mse, 4))
-    col3.metric("RMSE", round(best_rmse, 4))
-    col4.metric("R² Score", round(best_r2, 4))
+col1.metric("MAE", round(best_model["MAE"], 4))
+col2.metric("MSE", round(best_model["MSE"], 4))
+col3.metric("RMSE", round(best_model["RMSE"], 4))
+col4.metric("R² Score", round(best_model["R2 Score"], 4))
 # ==============================
 # VISUALIZATIONS SECTION
 # ==============================
@@ -324,39 +284,30 @@ st.header("Visualizations")
 
 if st.button("1. Actual vs Predicted Plot", key="viz_btn_1"):
 
-    if "best_predictions" not in st.session_state:
-        st.warning("Please click Train & Compare Models first.")
+    fig, ax = plt.subplots(figsize=(8, 6))
 
-    else:
-        y_test = st.session_state["y_test"]
-        best_predictions = st.session_state["best_predictions"]
-        best_model_name = st.session_state["best_model_name"]
+    ax.scatter(y_test, best_predictions, alpha=0.7)
 
-        fig, ax = plt.subplots(figsize=(8, 6))
+    min_value = min(np.min(y_test), np.min(best_predictions))
+    max_value = max(np.max(y_test), np.max(best_predictions))
 
-        ax.scatter(y_test, best_predictions, alpha=0.7)
+    ax.plot(
+        [min_value, max_value],
+        [min_value, max_value],
+        color="red",
+        linestyle="--",
+        label="Perfect Prediction"
+    )
 
-        min_value = min(np.min(y_test), np.min(best_predictions))
-        max_value = max(np.max(y_test), np.max(best_predictions))
+    ax.set_xlabel("Actual Diabetes Progression")
+    ax.set_ylabel("Predicted Diabetes Progression")
+    ax.set_title(f"Actual vs Predicted ({best_model_name})")
+    ax.legend()
+    ax.grid(True)
 
-        ax.plot(
-            [min_value, max_value],
-            [min_value, max_value],
-            color="red",
-            linestyle="--",
-            label="Perfect Prediction"
-        )
-
-        ax.set_xlabel("Actual Diabetes Progression")
-        ax.set_ylabel("Predicted Diabetes Progression")
-        ax.set_title(f"Actual vs Predicted ({best_model_name})")
-        ax.legend()
-        ax.grid(True)
-
-        fig.tight_layout()
-        st.pyplot(fig)
-        plt.close(fig)
-
+    fig.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
 
 # ==========================================
 # VISUALIZATION 2: RESIDUAL DISTRIBUTION
@@ -364,41 +315,28 @@ if st.button("1. Actual vs Predicted Plot", key="viz_btn_1"):
 
 if st.button("2. Residual Distribution Plot", key="viz_btn_2"):
 
-    if "best_predictions" not in st.session_state:
-        st.warning("Please click Train & Compare Models first.")
+    residuals = np.array(y_test) - np.array(best_predictions)
 
-    else:
-        y_test = st.session_state["y_test"]
-        best_predictions = st.session_state["best_predictions"]
-        best_model_name = st.session_state["best_model_name"]
+    fig, ax = plt.subplots(figsize=(8, 6))
 
-        residuals = np.array(y_test) - np.array(best_predictions)
+    ax.hist(residuals, bins=20, edgecolor="black")
 
-        fig, ax = plt.subplots(figsize=(8, 6))
+    ax.axvline(
+        x=0,
+        color="red",
+        linestyle="--",
+        label="Zero Error"
+    )
 
-        ax.hist(
-            residuals,
-            bins=20,
-            edgecolor="black"
-        )
+    ax.set_xlabel("Residuals (Actual - Predicted)")
+    ax.set_ylabel("Frequency")
+    ax.set_title(f"Residual Distribution ({best_model_name})")
+    ax.legend()
+    ax.grid(axis="y", alpha=0.3)
 
-        ax.axvline(
-            x=0,
-            color="red",
-            linestyle="--",
-            label="Zero Error"
-        )
-
-        ax.set_xlabel("Residuals (Actual - Predicted)")
-        ax.set_ylabel("Frequency")
-        ax.set_title(f"Residual Distribution ({best_model_name})")
-        ax.legend()
-        ax.grid(axis="y", alpha=0.3)
-
-        fig.tight_layout()
-        st.pyplot(fig)
-        plt.close(fig)
-
+    fig.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
 
 # ==========================================
 # VISUALIZATION 3: CORRELATION HEATMAP
@@ -478,67 +416,34 @@ if st.button("4. Clinical Feature Importance", key="viz_btn_4"):
 
 if st.button("5. Model Performance Comparison Charts", key="viz_btn_5"):
 
-    if "results_df" not in st.session_state:
-        st.warning("Please click Train & Compare Models first.")
+    fig, axes = plt.subplots(1, 4, figsize=(22, 6))
 
-    else:
-        results_df = st.session_state["results_df"]
+    # MAE
+    axes[0].bar(results_df["Model"], results_df["MAE"])
+    axes[0].set_title("Model Comparison - MAE")
+    axes[0].set_ylabel("MAE (Lower is Better)")
+    axes[0].tick_params(axis="x", rotation=45)
 
-        fig, axes = plt.subplots(
-            1, 4,
-            figsize=(22, 6)
-        )
+    # MSE
+    axes[1].bar(results_df["Model"], results_df["MSE"])
+    axes[1].set_title("Model Comparison - MSE")
+    axes[1].set_ylabel("MSE (Lower is Better)")
+    axes[1].tick_params(axis="x", rotation=45)
 
-        # MAE Comparison
-        axes[0].bar(
-            results_df["Model"],
-            results_df["MAE"]
-        )
+    # RMSE
+    axes[2].bar(results_df["Model"], results_df["RMSE"])
+    axes[2].set_title("Model Comparison - RMSE")
+    axes[2].set_ylabel("RMSE (Lower is Better)")
+    axes[2].tick_params(axis="x", rotation=45)
 
-        axes[0].set_title("Model Comparison - MAE")
-        axes[0].set_ylabel("MAE (Lower is Better)")
-        axes[0].tick_params(axis="x", rotation=45)
+    # R2
+    axes[3].bar(results_df["Model"], results_df["R2 Score"])
+    axes[3].set_title("Model Comparison - R²")
+    axes[3].set_ylabel("R² (Higher is Better)")
+    axes[3].tick_params(axis="x", rotation=45)
 
+    plt.suptitle("Performance Comparison of Regression Models", fontsize=16)
 
-        # MSE Comparison
-        axes[1].bar(
-            results_df["Model"],
-            results_df["MSE"]
-        )
-
-        axes[1].set_title("Model Comparison - MSE")
-        axes[1].set_ylabel("MSE (Lower is Better)")
-        axes[1].tick_params(axis="x", rotation=45)
-
-
-        # RMSE Comparison
-        axes[2].bar(
-            results_df["Model"],
-            results_df["RMSE"]
-        )
-
-        axes[2].set_title("Model Comparison - RMSE")
-        axes[2].set_ylabel("RMSE (Lower is Better)")
-        axes[2].tick_params(axis="x", rotation=45)
-
-
-        # R2 Comparison
-        axes[3].bar(
-            results_df["Model"],
-            results_df["R2 Score"]
-        )
-
-        axes[3].set_title("Model Comparison - R²")
-        axes[3].set_ylabel("R² (Higher is Better)")
-        axes[3].tick_params(axis="x", rotation=45)
-
-
-        plt.suptitle(
-            "Performance Comparison of Regression Models",
-            fontsize=16
-        )
-
-        fig.tight_layout()
-
-        st.pyplot(fig)
-        plt.close(fig)
+    fig.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
