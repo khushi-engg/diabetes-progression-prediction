@@ -173,3 +173,101 @@ if st.button("Show Top 5 Feature Plots"):
         "Correlation Value",
         round(target_corr.iloc[0], 3)
     )
+
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+
+# ==========================================
+# MODEL COMPARISON - FOUR REGRESSION MODELS
+# ==========================================
+
+st.header("Model Comparison")
+
+st.write("Compare the performance of four machine learning regression models.")
+
+# Prepare features and target
+X = df[features].copy()
+y = df["target"].copy()
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Initialize four models
+models = {
+    "Linear Regression": make_pipeline(
+        StandardScaler(),
+        LinearRegression()
+    ),
+
+    "KNN Regression": make_pipeline(
+        StandardScaler(),
+        KNeighborsRegressor(n_neighbors=5)
+    ),
+
+    "Decision Tree Regression": DecisionTreeRegressor(
+        max_depth=5,
+        random_state=42
+    ),
+
+    "Random Forest Regression": RandomForestRegressor(
+        n_estimators=200,
+        random_state=42
+    )
+}
+
+if st.button("Train & Compare Models"):
+
+    results = []
+    predictions = {}
+
+    for name, model in models.items():
+
+        # Train model
+        model.fit(X_train, y_train)
+
+        # Predict test data
+        y_pred = model.predict(X_test)
+
+        predictions[name] = y_pred
+
+        # Evaluation metrics
+        mae = mean_absolute_error(y_test, y_pred)
+        mse = mean_squared_error(y_test, y_pred)
+        rmse = np.sqrt(mse)
+        r2 = r2_score(y_test, y_pred)
+
+        # Save results
+        results.append({
+            "Model": name,
+            "MAE": mae,
+            "MSE": mse,
+            "RMSE": rmse,
+            "R2 Score": r2
+        })
+
+    # Create results DataFrame
+    results_df = pd.DataFrame(results)
+
+    # Display model comparison
+    st.subheader("Model Performance Comparison")
+
+    st.dataframe(
+        results_df.round(4),
+        use_container_width=True,
+        hide_index=True
+    )
+
