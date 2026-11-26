@@ -72,10 +72,19 @@ if st.button("Show EDA Summary"):
     st.write("Missing values:", df.isnull().sum().sum())
     st.write("Duplicate records:", df.duplicated().sum())
 
-    st.write("### Feature Names")
+   # ==========================================
+# FEATURE CARDS
+# ==========================================
 
-    for feature in features:
-        st.write("-", feature)
+st.write("### Clinical Features")
+
+feature_columns = st.columns(5)
+
+for i, feature in enumerate(features):
+    with feature_columns[i % 5]:
+        with st.container(border=True):
+            st.markdown(f"**{feature.upper()}**")
+            st.caption(f"Feature {i + 1}")
 
     st.write("### Target Statistics")
 
