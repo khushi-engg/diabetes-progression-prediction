@@ -128,3 +128,48 @@ if st.button("Show Correlation Ranking"):
     st.pyplot(fig)
 
     plt.close(fig)
+# Select the top 5 features based on correlation strength
+top_features = target_corr.abs().sort_values(ascending=False).head(5).index
+# ==========================================
+# TOP 5 CLINICAL FEATURES
+# ==========================================
+
+st.subheader("Top 5 Clinical Features vs Diabetes Progression")
+
+if st.button("Show Top 5 Feature Plots"):
+
+    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+    axes = axes.flatten()
+
+    for i, feature in enumerate(top_features):
+
+        sns.scatterplot(
+            data=df,
+            x=feature,
+            y="target",
+            alpha=0.6,
+            ax=axes[i]
+        )
+
+        axes[i].set_title(f"{feature} vs Progression")
+        axes[i].set_xlabel(feature)
+        axes[i].set_ylabel("Diabetes Progression")
+
+    # Remove the unused 6th subplot
+    fig.delaxes(axes[5])
+
+    fig.suptitle("Top 5 Clinical Features vs Diabetes Progression")
+    fig.tight_layout()
+
+    st.pyplot(fig)
+    plt.close(fig)
+
+    # Strongest related feature
+    st.markdown("### Strongest Related Feature")
+
+    st.success(f"**Feature:** {target_corr.index[0].upper()}")
+
+    st.metric(
+        "Correlation Value",
+        round(target_corr.iloc[0], 3)
+    )
