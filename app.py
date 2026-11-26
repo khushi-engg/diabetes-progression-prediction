@@ -66,13 +66,12 @@ st.subheader(" The Diabetes Progression dataset.")
 # DATASET EXPLORER
 # ==========================================
 
-st.header("Dataset Explorer")
-
 if st.button("Show Dataset", key="dataset_preview_btn"):
 
     st.dataframe(
-        df.head(10),
+        df,                      # Full dataset: all 442 rows
         use_container_width=True,
+        height=400,              # Compact initial view (~10 rows)
         hide_index=True
     )
 
