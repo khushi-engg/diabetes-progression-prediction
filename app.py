@@ -270,6 +270,17 @@ if st.button("Train & Compare Models"):
         use_container_width=True,
         hide_index=True
     )
+    best_model = results_df.loc[results_df["RMSE"].idxmin()]
+    best_model_name = best_model["Model"]
+
+    # Get predictions from the best model
+    best_predictions = predictions[best_model_name]
+
+    # Save everything in Streamlit session state
+    st.session_state["results_df"] = results_df
+    st.session_state["best_model_name"] = best_model_name
+    st.session_state["best_predictions"] = best_predictions
+    st.session_state["y_test"] = y_test
     # ==========================================
     # BEST PERFORMING MODEL
     # ==========================================
