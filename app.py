@@ -60,7 +60,7 @@ if st.button("Show Scatter Plots"):
 # ==========================================
 # EDA SUMMARY
 # ==========================================
-
+section_gap(30)
 st.subheader("EDA Summary")
 
 if st.button("Show EDA Summary", key="eda_summary_btn"):
