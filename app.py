@@ -5,7 +5,9 @@ import seaborn as sns
 from sklearn.datasets import load_diabetes
 # Load the Diabetes dataset
 diabetes = load_diabetes()
-
+def section_gap(height=35):
+    st.write("")
+    st.markdown(f"<div style='height:{height}px'></div>", unsafe_allow_html=True)
 # Convert the dataset into a DataFrame
 df = pd.DataFrame(
     diabetes.data,
@@ -25,12 +27,12 @@ features = diabetes.feature_names
 # Dataset Explorer
 
 st.write(" The Diabetes Progression dataset.")
-
+section_gap(30)
 # Button to display first 10 rows
 if st.button("Show First 10 Rows"):
     st.dataframe(df.head(10), use_container_width=True)
 
-
+section_gap(30)
 st.subheader("Feature vs Diabetes Progression Scatter Plots")
 
 if st.button("Show Scatter Plots"):
@@ -58,7 +60,7 @@ if st.button("Show Scatter Plots"):
 # ==========================================
 # EDA SUMMARY
 # ==========================================
-
+section_gap(30)
 st.subheader("EDA Summary")
 
 if st.button("Show EDA Summary"):
@@ -101,6 +103,7 @@ target_corr = df.corr()["target"].drop("target")
 target_corr = target_corr.reindex(
     target_corr.abs().sort_values(ascending=False).index
 )
+section_gap(30)
 # ==========================================
 # CORRELATION RANKING
 # ==========================================
@@ -133,7 +136,7 @@ top_features = target_corr.abs().sort_values(ascending=False).head(5).index
 # ==========================================
 # TOP 5 CLINICAL FEATURES
 # ==========================================
-
+section_gap(30)
 st.subheader("Top 5 Clinical Features vs Diabetes Progression")
 
 if st.button("Show Top 5 Feature Plots"):
@@ -200,7 +203,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # ==========================================
 # MODEL COMPARISON
 # ==========================================
-
+section_gap(30)
 st.header("Model Comparison")
 
 if st.button("Show Model Comparison", key="model_comparison_btn"):
@@ -301,7 +304,7 @@ if st.session_state.get("comparison_done", False):
 # ==============================
 
 
-
+section_gap(30)
 
 # ==========================================
 # VISUALIZATIONS SECTION
