@@ -60,39 +60,45 @@ if st.button("Show Scatter Plots"):
 # ==========================================
 # EDA SUMMARY
 # ==========================================
-section_gap(30)
+
 st.subheader("EDA Summary")
 
-if st.button("Show EDA Summary"):
+if st.button("Show EDA Summary", key="eda_summary_btn"):
 
-    st.write("=" * 50)
+    # Dataset Overview
+    st.markdown("### Dataset Overview")
 
-    st.write("Number of patient records:", df.shape[0])
-    st.write("Number of clinical features:", len(features))
-    st.write("Target variable: Diabetes progression")
+    col1, col2, col3, col4 = st.columns(4)
 
-    st.write("Missing values:", df.isnull().sum().sum())
-    st.write("Duplicate records:", df.duplicated().sum())
+    col1.metric("Total Records", df.shape[0])
+    col2.metric("Total Features", len(features))
+    col3.metric("Missing Values", df.isnull().sum().sum())
+    col4.metric("Duplicate Rows", df.duplicated().sum())
 
-   # ==========================================
-# FEATURE CARDS
-# ==========================================
+    section_gap(20)
 
-st.write("### Clinical Features")
+    # Clinical Features
+    st.markdown("### Clinical Features")
 
-feature_columns = st.columns(5)
+    feature_columns = st.columns(5)
 
-for i, feature in enumerate(features):
-    with feature_columns[i % 5]:
-        with st.container(border=True):
-            st.markdown(f"**{feature.upper()}**")
-            st.caption(f"Feature {i + 1}")
-st.write("### Target Statistics")
+    for i, feature in enumerate(features):
+        with feature_columns[i % 5]:
+            with st.container(border=True):
+                st.markdown(f"**{feature.upper()}**")
+                st.caption(f"Feature {i + 1}")
 
-st.dataframe(
-        df["target"].describe().to_frame(),
+    section_gap(20)
+
+    # Target Statistics
+    st.markdown("### Target Statistics")
+
+    target_stats = df["target"].describe().to_frame()
+
+    st.dataframe(
+        target_stats,
         use_container_width=True
-)
+    )
 # ==========================================
 # CALCULATE FEATURE CORRELATION
 # ==========================================
