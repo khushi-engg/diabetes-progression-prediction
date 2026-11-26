@@ -193,77 +193,41 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # MODEL COMPARISON
 # ==========================================
 
+# ==========================================
+# MODEL COMPARISON SECTION
+# ==========================================
+
 st.header("Model Comparison")
-st.write("Compare the performance of four machine learning regression models.")
 
-X = df[features].copy()
-y = df["target"].copy()
+if st.button("Show Model Comparison", key="model_comparison_btn"):
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+    st.write("Compare the performance of four machine learning regression models.")
 
-models = {
-    "Linear Regression": make_pipeline(
-        StandardScaler(), LinearRegression()
-    ),
-    "KNN Regression": make_pipeline(
-        StandardScaler(), KNeighborsRegressor(n_neighbors=5)
-    ),
-    "Decision Tree Regression": DecisionTreeRegressor(
-        max_depth=5, random_state=42
-    ),
-    "Random Forest Regression": RandomForestRegressor(
-        n_estimators=200, random_state=42
+    # YOUR EXISTING MODEL TRAINING CODE GOES HERE
+
+    # Model Performance Table
+    st.subheader("Model Performance Comparison")
+
+    st.dataframe(
+        results_df.round(4),
+        use_container_width=True,
+        hide_index=True
     )
-}
 
-results = []
-predictions = {}
+    # Best Performing Model
+    st.subheader("Best Performing Model")
 
-for name, model in models.items():
+    best_model = results_df.loc[results_df["RMSE"].idxmin()]
+    best_model_name = best_model["Model"]
 
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
+    st.success(f"Best Model: {best_model_name}")
 
-    predictions[name] = y_pred
+    col1, col2, col3, col4 = st.columns(4)
 
-    mae = mean_absolute_error(y_test, y_pred)
-    mse = mean_squared_error(y_test, y_pred)
-    rmse = np.sqrt(mse)
-    r2 = r2_score(y_test, y_pred)
-
-    results.append({
-        "Model": name,
-        "MAE": mae,
-        "MSE": mse,
-        "RMSE": rmse,
-        "R2 Score": r2
-    })
-
-results_df = pd.DataFrame(results)
-
-st.subheader("Model Performance Comparison")
-st.dataframe(
-    results_df.round(4),
-    use_container_width=True,
-    hide_index=True
-)
-
-# Find the best model
-best_model = results_df.loc[results_df["RMSE"].idxmin()]
-best_model_name = best_model["Model"]
-best_predictions = predictions[best_model_name]
-
-st.subheader("Best Performing Model")
-st.success(f"Best Model: {best_model_name}")
-
-col1, col2, col3, col4 = st.columns(4)
-
-col1.metric("MAE", round(best_model["MAE"], 4))
-col2.metric("MSE", round(best_model["MSE"], 4))
-col3.metric("RMSE", round(best_model["RMSE"], 4))
-col4.metric("R² Score", round(best_model["R2 Score"], 4))
+    col1.metric("MAE", round(best_model["MAE"], 4))
+    col2.metric("MSE", round(best_model["MSE"], 4))
+    col3.metric("RMSE", round(best_model["RMSE"], 4))
+    col4.metric("R² Score", round(best_model["R2 Score"], 4))
 # ==============================
 # VISUALIZATIONS SECTION
 # ==============================
