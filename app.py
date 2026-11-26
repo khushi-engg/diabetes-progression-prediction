@@ -17,12 +17,12 @@ df["target"] = diabetes.target
 
 # Website title
 st.title("Diabetes Progression Prediction")
-st.write("Machine Learning Web Application")
+
 
 
 # Dataset Explorer
-st.subheader("Dataset Explorer")
-st.write("Explore the Diabetes Progression dataset.")
+
+st.write(" The Diabetes Progression dataset.")
 
 # Button to display first 10 rows
 if st.button("Show First 10 Rows"):
