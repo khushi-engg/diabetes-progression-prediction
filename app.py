@@ -55,3 +55,31 @@ if st.button("Show Scatter Plots"):
 
     plt.close(fig)
 
+# ==========================================
+# EDA SUMMARY
+# ==========================================
+
+st.subheader("EDA Summary")
+
+if st.button("Show EDA Summary"):
+
+    st.write("=" * 50)
+
+    st.write("Number of patient records:", df.shape[0])
+    st.write("Number of clinical features:", len(features))
+    st.write("Target variable: Diabetes progression")
+
+    st.write("Missing values:", df.isnull().sum().sum())
+    st.write("Duplicate records:", df.duplicated().sum())
+
+    st.write("### Feature Names")
+
+    for feature in features:
+        st.write("-", feature)
+
+    st.write("### Target Statistics")
+
+    st.dataframe(
+        df["target"].describe().to_frame(),
+        use_container_width=True
+    )
