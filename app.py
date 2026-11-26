@@ -85,10 +85,9 @@ for i, feature in enumerate(features):
         with st.container(border=True):
             st.markdown(f"**{feature.upper()}**")
             st.caption(f"Feature {i + 1}")
+st.write("### Target Statistics")
 
-    st.write("### Target Statistics")
-
-    st.dataframe(
+st.dataframe(
         df["target"].describe().to_frame(),
         use_container_width=True
-    )
+)
