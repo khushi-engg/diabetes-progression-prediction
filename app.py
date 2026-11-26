@@ -92,6 +92,16 @@ st.dataframe(
         use_container_width=True
 )
 # ==========================================
+# CALCULATE FEATURE CORRELATION
+# ==========================================
+
+target_corr = df.corr()["target"].drop("target")
+
+# Sort features by absolute correlation strength
+target_corr = target_corr.reindex(
+    target_corr.abs().sort_values(ascending=False).index
+)
+# ==========================================
 # CORRELATION RANKING
 # ==========================================
 
