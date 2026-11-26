@@ -270,4 +270,26 @@ if st.button("Train & Compare Models"):
         use_container_width=True,
         hide_index=True
     )
+    # ==========================================
+    # BEST PERFORMING MODEL
+    # ==========================================
 
+    st.subheader("Best Performing Model")
+
+    # Select model with lowest RMSE
+    best_model = results_df.loc[results_df["RMSE"].idxmin()]
+
+    best_model_name = best_model["Model"]
+    best_mae = best_model["MAE"]
+    best_mse = best_model["MSE"]
+    best_rmse = best_model["RMSE"]
+    best_r2 = best_model["R2 Score"]
+
+    st.success(f"Best Model: {best_model_name}")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric("MAE", round(best_mae, 4))
+    col2.metric("MSE", round(best_mse, 4))
+    col3.metric("RMSE", round(best_rmse, 4))
+    col4.metric("R² Score", round(best_r2, 4))
