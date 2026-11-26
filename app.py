@@ -58,9 +58,38 @@ features = diabetes.feature_names
 st.subheader(" The Diabetes Progression dataset.")
 
 # Button to display first 10 rows
-if st.button("Show First 10 Rows"):
-    st.dataframe(df.head(10), use_container_width=True)
+# ==========================================
+# DATASET EXPLORER
+# ==========================================
 
+
+
+if st.button("Show First 10 Rows", key="dataset_preview_btn"):
+    st.dataframe(
+        df.head(10),
+        use_container_width=True,
+        hide_index=True
+    )
+
+# Full dataset view
+if st.button("View Complete Dataset (442 Rows)", key="full_dataset_btn"):
+    st.dataframe(
+        df,
+        use_container_width=True,
+        height=500,
+        hide_index=True
+    )
+
+# Download complete dataset
+csv_data = df.to_csv(index=False)
+
+st.download_button(
+    label="Download Complete Dataset (CSV)",
+    data=csv_data,
+    file_name="diabetes_dataset.csv",
+    mime="text/csv",
+    key="download_dataset_btn"
+)
 section_gap(30)
 st.subheader("Feature vs Diabetes Progression Scatter Plots")
 
