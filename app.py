@@ -26,8 +26,8 @@ features = diabetes.feature_names
 
 # Dataset Explorer
 
-st.write(" The Diabetes Progression dataset.")
-section_gap(30)
+st.subheader(" The Diabetes Progression dataset.")
+
 # Button to display first 10 rows
 if st.button("Show First 10 Rows"):
     st.dataframe(df.head(10), use_container_width=True)
